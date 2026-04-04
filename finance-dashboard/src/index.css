@@ -1,0 +1,336 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --finova-bg: #f6f7fb;
+  --finova-bg-soft: #f9faff;
+  --finova-surface: #ffffff;
+  --finova-surface-soft: #f7f8ff;
+  --finova-border: #e8ebf5;
+  --finova-border-strong: #d8dded;
+  --finova-text: #20253b;
+  --finova-muted: #8f95ab;
+  --finova-accent: #7e7cf5;
+  --finova-accent-soft: rgba(126, 124, 245, 0.12);
+  --finova-success: #2fc99b;
+  --finova-danger: #f07f8c;
+  --finova-warning: #f1b34e;
+  --finova-shadow: 0 24px 48px -34px rgba(30, 35, 65, 0.2);
+  font-family:
+    "Plus Jakarta Sans",
+    "Segoe UI",
+    "Trebuchet MS",
+    "Helvetica Neue",
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at top right, rgba(126, 124, 245, 0.12), transparent 28%),
+    linear-gradient(180deg, #fbfbff 0%, var(--finova-bg) 100%);
+  color: var(--finova-text);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(126, 124, 245, 0.18);
+}
+
+#root {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.finova-shell {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  color: var(--finova-text);
+}
+
+.finova-layout {
+  display: grid;
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  grid-template-columns: 280px minmax(0, 1fr);
+}
+
+.finova-sidebar {
+  background: rgba(255, 255, 255, 0.92);
+  border-right: 1px solid var(--finova-border);
+  backdrop-filter: blur(18px);
+}
+
+.finova-topbar {
+  background: rgba(246, 247, 251, 0.9);
+  border-bottom: 1px solid var(--finova-border);
+  backdrop-filter: blur(18px);
+}
+
+.finova-card {
+  background: var(--finova-surface);
+  border: 1px solid var(--finova-border);
+  box-shadow: var(--finova-shadow);
+  border-radius: 24px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.finova-card-soft {
+  background: var(--finova-surface-soft);
+  border: 1px solid var(--finova-border);
+  border-radius: 20px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.finova-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  border: 1px solid var(--finova-border);
+  background: var(--finova-surface);
+  color: var(--finova-muted);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.finova-icon-button:hover {
+  transform: translateY(-1px);
+  border-color: var(--finova-border-strong);
+  color: var(--finova-text);
+  box-shadow: 0 10px 22px -18px rgba(30, 35, 65, 0.28);
+}
+
+.finova-action-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.finova-action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 42px;
+  padding: 0 1rem;
+  border-radius: 16px;
+  border: 1px solid var(--finova-border);
+  background: var(--finova-surface);
+  color: var(--finova-text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  white-space: nowrap;
+  box-shadow: 0 12px 28px -26px rgba(30, 35, 65, 0.36);
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    opacity 180ms ease;
+}
+
+.finova-action-button:hover {
+  transform: translateY(-1px);
+  border-color: var(--finova-border-strong);
+  box-shadow: 0 18px 32px -24px rgba(30, 35, 65, 0.24);
+}
+
+.finova-action-button:focus-visible {
+  outline: none;
+  border-color: var(--finova-accent);
+  box-shadow:
+    0 0 0 4px rgba(126, 124, 245, 0.14),
+    0 18px 32px -24px rgba(30, 35, 65, 0.24);
+}
+
+.finova-action-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
+}
+
+.finova-action-button svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.finova-action-button--primary {
+  border-color: transparent;
+  background: linear-gradient(180deg, #8b89ff 0%, var(--finova-accent) 100%);
+  color: #ffffff;
+  box-shadow: 0 20px 34px -24px rgba(126, 124, 245, 0.9);
+}
+
+.finova-action-button--primary:hover {
+  border-color: transparent;
+  box-shadow: 0 22px 38px -24px rgba(126, 124, 245, 0.82);
+}
+
+.finova-action-button--secondary {
+  background: var(--finova-bg-soft);
+}
+
+.finova-action-button--danger {
+  border-color: rgba(240, 127, 140, 0.24);
+  background: rgba(240, 127, 140, 0.08);
+  color: #c45868;
+  box-shadow: none;
+}
+
+.finova-action-button--danger:hover {
+  border-color: rgba(240, 127, 140, 0.34);
+  background: rgba(240, 127, 140, 0.12);
+  color: #b84a5b;
+  box-shadow: 0 16px 30px -26px rgba(240, 127, 140, 0.72);
+}
+
+.finova-action-button--sm {
+  min-height: 36px;
+  padding: 0 0.9rem;
+  border-radius: 14px;
+  font-size: 0.84rem;
+}
+
+.finova-nav-item {
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.finova-nav-item:hover {
+  transform: translateX(2px);
+}
+
+.finova-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.finova-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-color: rgba(143, 149, 171, 0.22);
+  background-clip: padding-box;
+}
+
+.finova-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+html.theme-dark {
+  color-scheme: dark;
+  --finova-bg: #0b1020;
+  --finova-bg-soft: #11172a;
+  --finova-surface: #11172a;
+  --finova-surface-soft: #151c31;
+  --finova-border: rgba(148, 163, 184, 0.16);
+  --finova-border-strong: rgba(148, 163, 184, 0.28);
+  --finova-text: #eff3ff;
+  --finova-muted: #98a2ba;
+  --finova-accent: #8d8aff;
+  --finova-accent-soft: rgba(141, 138, 255, 0.18);
+  --finova-success: #43d6ab;
+  --finova-danger: #ff8f9b;
+  --finova-warning: #ffc96b;
+  --finova-shadow: 0 24px 48px -34px rgba(2, 6, 23, 0.88);
+}
+
+html.theme-dark body {
+  background:
+    radial-gradient(circle at top right, rgba(141, 138, 255, 0.16), transparent 22%),
+    linear-gradient(180deg, #060a14 0%, var(--finova-bg) 100%);
+}
+
+html.theme-dark .finova-sidebar,
+html.theme-dark .finova-topbar {
+  background: rgba(11, 16, 32, 0.84);
+}
+
+html.theme-dark .finova-icon-button {
+  background: var(--finova-surface);
+  color: var(--finova-muted);
+}
+
+html.theme-dark .finova-icon-button:hover {
+  color: var(--finova-text);
+}
+
+html.theme-dark .finova-action-button {
+  background: var(--finova-surface-soft);
+}
+
+html.theme-dark .finova-action-button--secondary {
+  background: rgba(148, 163, 184, 0.08);
+}
+
+html.theme-dark .finova-action-button--primary {
+  background: linear-gradient(180deg, #9895ff 0%, var(--finova-accent) 100%);
+}
+
+html.theme-dark .finova-action-button--danger {
+  border-color: rgba(255, 143, 155, 0.24);
+  background: rgba(255, 143, 155, 0.08);
+  color: #ffb5bf;
+}
+
+html.theme-dark .finova-action-button--danger:hover {
+  border-color: rgba(255, 143, 155, 0.38);
+  background: rgba(255, 143, 155, 0.14);
+  color: #ffc8d0;
+}
+
+@media (max-width: 1024px) {
+  .finova-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .finova-sidebar {
+    border-right: 1px solid var(--finova-border);
+    border-bottom: 0;
+    box-shadow: 0 24px 48px -28px rgba(30, 35, 65, 0.22);
+  }
+}
