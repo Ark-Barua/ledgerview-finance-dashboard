@@ -4,11 +4,13 @@ import { useFinance } from "../context/FinanceContext";
 import { formatDate } from "../utils/calculateStats";
 import { downloadTextFile } from "../utils/downloadFile";
 
+import { csvCell, exportRun } from "../utils/reportExport";
+
 function buildReportsExport(reports) {
   const headers = ["title", "cadence", "audience", "status", "lastRunAt", "runCount"];
   const rows = reports.map((report) => {
     return headers
-      .map((header) => `"${`${report[header] ?? ""}`.replaceAll('"', '""')}"`)
+      .map(header => csvCell(report[header]))
       .join(",");
   });
 
@@ -16,8 +18,13 @@ function buildReportsExport(reports) {
 }
 
 export default function Reports() {
-  const { deleteReport, reports, role, runReports } = useFinance();
+  const { createReport, deleteReport, reports, reportRuns, role, runReports, scheduleReport } = useFinance();
   const [statusMessage, setStatusMessage] = useState("");
+
+  const [creating, setCreating] = useState(false);
+
+  const [scheduling, setScheduling] = useState(null);
+  const [format,setFormat] = useState("csv");
 
   if (role !== "admin") {
     return (
@@ -38,7 +45,7 @@ export default function Reports() {
     );
   }
 
-  const handleDeleteReport = (reportId) => {
+  const handleDeleteReport = async (reportId) => {
     const shouldDelete = window.confirm(
       "Delete this report template? This action cannot be undone.",
     );
@@ -47,7 +54,8 @@ export default function Reports() {
       return;
     }
 
-    deleteReport(reportId);
+    const deletion = await deleteReport(reportId);
+    if (!deletion.success) return;
     setStatusMessage("Report deleted from the workspace.");
   };
 
@@ -65,11 +73,13 @@ export default function Reports() {
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <button className="finova-action-button" onClick={() => setCreating(true)}>Create report</button>
             <button
               className="finova-action-button finova-action-button--primary"
               type="button"
-              onClick={() => {
-                const result = runReports();
+              disabled={!reports.length}
+              onClick={async () => {
+                const result = await runReports();
 
                 if (!result.success) {
                   setStatusMessage("Report generation failed.");
@@ -89,6 +99,7 @@ export default function Reports() {
             <button
               className="finova-action-button"
               type="button"
+              disabled={!reports.length}
               onClick={() =>
                 downloadTextFile(
                   "ledgerview-reports.csv",
@@ -103,6 +114,23 @@ export default function Reports() {
           </div>
         </div>
 
+        {creating && <form className="mt-5 grid gap-3" onSubmit={async event => {
+          event.preventDefault();
+          const draft = Object.fromEntries(new FormData(event.currentTarget));
+          if (!draft.nextDate) draft.cadence = "Manual";
+          const result = await createReport(draft);
+          setStatusMessage(result.success ? "Report created." : result.message);
+          if (result.success) setCreating(false);
+        }}>
+          {["Title", "Audience"].map(label => <label key={label} className="grid gap-1 text-sm">
+            {label}<input required maxLength={200} name={label.toLowerCase()} className="h-11 border border-[var(--finova-border)] px-3" />
+          </label>)}
+          <label>Frequency <select name="cadence" defaultValue="Weekly"><option>Daily</option><option>Weekly</option><option>Monthly</option></select></label>
+          <label>First scheduled date (UTC, optional) <input type="date" name="nextDate" min={new Date().toISOString().slice(0,10)} /></label>
+          <div className="flex gap-3"><button className="finova-action-button" type="submit">Save report</button>
+            <button className="finova-action-button" type="button" onClick={() => setCreating(false)}>Cancel</button></div>
+        </form>}
+        {!reports.length && !creating && <p className="mt-4 text-sm">No reports yet.</p>}
         <div className="mt-4 min-h-6 text-sm text-[var(--finova-accent)]">
           {statusMessage || null}
         </div>
@@ -135,6 +163,16 @@ export default function Reports() {
               Run count: {reportItem.runCount}
             </p>
 
+            <p className="mt-2 text-sm">Next scheduled run: {reportItem.nextDate ? formatDate(reportItem.nextDate) + " UTC" : "Manual only"}</p>
+            <button className="finova-action-button mt-3" onClick={() => setScheduling(scheduling === reportItem.id ? null : reportItem.id)}>Change schedule</button>
+            {scheduling === reportItem.id && <form className="desk-panel mt-2" onSubmit={async e => {
+              e.preventDefault(); const draft = Object.fromEntries(new FormData(e.currentTarget));
+              const result = await scheduleReport(reportItem.id,draft); if (result.success) setScheduling(null);
+            }}><label>Frequency <select name="cadence" defaultValue={reportItem.cadence}><option>Daily</option><option>Weekly</option><option>Monthly</option></select></label>
+              <label>Next date (UTC) <input required type="date" name="nextDate" min={new Date().toISOString().slice(0,10)} defaultValue={reportItem.nextDate || ""} /></label>
+              <button className="finova-action-button">Save schedule</button>
+              {reportItem.nextDate && <button type="button" onClick={async () => { if ((await scheduleReport(reportItem.id,{nextDate:null})).success) setScheduling(null); }}>Stop schedule</button>}
+            </form>}
             <button
               className="finova-action-button finova-action-button--danger finova-action-button--sm mt-5"
               type="button"
@@ -146,6 +184,12 @@ export default function Reports() {
           </article>
         ))}
       </div>
+      <section className="desk-panel"><header><h2>Generated reports</h2><label>Export format <select value={format} onChange={e => setFormat(e.target.value)}>
+        <option value="csv">CSV</option><option value="json">JSON</option><option value="html">Printable HTML</option></select></label></header>
+        {!reportRuns.length && <p>Run a report to capture a dated summary of income and expenses by category.</p>}
+        {reportRuns.map(run => <div className="plan-row" key={run.id}><div><strong>{run.title}</strong><p>Through {formatDate(run.asOf)} · {run.groups.reduce((n,g) => n+g.entries,0)} transactions</p></div>
+          <button className="finova-action-button" onClick={() => exportRun(run,format)}>Download {format.toUpperCase()}</button></div>)}
+      </section>
     </section>
   );
 }

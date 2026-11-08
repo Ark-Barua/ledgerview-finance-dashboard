@@ -130,7 +130,7 @@ function getChartOptions(isDarkMode, animationEnabled, isMobileViewport) {
         bottom: 0,
       },
     },
-    animation: animationEnabled
+    animation: animationEnabled && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
       ? {
           duration: 650,
           easing: "easeOutQuart",
@@ -242,12 +242,12 @@ export default function TrendChart({ isDarkMode = false }) {
       {
         label: "Income",
         data: trendSeries.map((period) => period.income),
-        borderColor: "#7e7cf5",
-        backgroundColor: "rgba(126, 124, 245, 0.08)",
+        borderColor: "#298667",
+        backgroundColor: "rgba(41, 134, 103, 0.08)",
         borderWidth: 3,
         pointRadius: isSinglePeriodView ? 5 : 0,
         pointHoverRadius: isSinglePeriodView ? 7 : 5,
-        pointBackgroundColor: "#7e7cf5",
+        pointBackgroundColor: "#298667",
         pointBorderColor: "#ffffff",
         pointBorderWidth: isSinglePeriodView ? 2 : 0,
         tension: 0.38,
@@ -256,12 +256,12 @@ export default function TrendChart({ isDarkMode = false }) {
       {
         label: "Expenses",
         data: trendSeries.map((period) => period.expense),
-        borderColor: "#37c7b3",
-        backgroundColor: "rgba(55, 199, 179, 0.08)",
+        borderColor: "#c27343",
+        backgroundColor: "rgba(194, 115, 67, 0.08)",
         borderWidth: 3,
         pointRadius: isSinglePeriodView ? 5 : 0,
         pointHoverRadius: isSinglePeriodView ? 7 : 5,
-        pointBackgroundColor: "#37c7b3",
+        pointBackgroundColor: "#c27343",
         pointBorderColor: "#ffffff",
         pointBorderWidth: isSinglePeriodView ? 2 : 0,
         tension: 0.38,
@@ -275,11 +275,10 @@ export default function TrendChart({ isDarkMode = false }) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 max-w-xl">
           <p className="text-lg font-semibold text-[var(--finova-text)]">
-            Cashflow Statistic
+            Cash flow
           </p>
           <p className="mt-1 text-sm text-[var(--finova-muted)]">
-            {selectedTrendOption?.label ?? "Monthly"} income and expense
-            movement from the filtered dashboard view.
+            {selectedTrendOption?.label ?? "Monthly"} income and expenses.
           </p>
         </div>
 
@@ -309,11 +308,11 @@ export default function TrendChart({ isDarkMode = false }) {
 
       <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-[var(--finova-muted)]">
         <div className="inline-flex items-center gap-2">
-          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#7e7cf5]" />
+          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#298667]" />
           Income
         </div>
         <div className="inline-flex items-center gap-2">
-          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#37c7b3]" />
+          <span className="inline-flex h-2.5 w-2.5 rounded-full bg-[#c27343]" />
           Expenses
         </div>
       </div>

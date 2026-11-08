@@ -70,12 +70,12 @@ export default function AssetManagement() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const result = editingAsset
-      ? updateAssetWorkflow(editingAsset.id, assetDraft)
-      : createAssetWorkflow(assetDraft);
+      ? await updateAssetWorkflow(editingAsset.id, assetDraft)
+      : await createAssetWorkflow(assetDraft);
 
     if (!result.success) {
       setStatusMessage(result.message);
@@ -85,7 +85,7 @@ export default function AssetManagement() {
     resetEditor();
   };
 
-  const handleDeleteWorkflow = (assetId) => {
+  const handleDeleteWorkflow = async (assetId) => {
     const shouldDelete = window.confirm(
       "Delete this asset workflow? This action cannot be undone.",
     );
@@ -94,7 +94,8 @@ export default function AssetManagement() {
       return;
     }
 
-    deleteAssetWorkflow(assetId);
+    const deletion = await deleteAssetWorkflow(assetId);
+    if (!deletion.success) return;
 
     if (editingAssetId === assetId) {
       resetEditor();
@@ -142,7 +143,7 @@ export default function AssetManagement() {
               <input
                 className="h-11 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)]"
                 name="title"
-                placeholder="Treasury allocation"
+                placeholder="Workflow title"
                 type="text"
                 value={assetDraft.title}
                 onChange={handleDraftChange}
@@ -156,7 +157,7 @@ export default function AssetManagement() {
               <input
                 className="h-11 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)]"
                 name="status"
-                placeholder="Under review"
+                placeholder="Workflow status"
                 type="text"
                 value={assetDraft.status}
                 onChange={handleDraftChange}
@@ -170,7 +171,7 @@ export default function AssetManagement() {
               <input
                 className="h-11 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)]"
                 name="owner"
-                placeholder="Admin"
+                placeholder="Owner name"
                 type="text"
                 value={assetDraft.owner}
                 onChange={handleDraftChange}

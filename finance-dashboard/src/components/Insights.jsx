@@ -50,16 +50,10 @@ export default function Insights() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-lg font-semibold text-[var(--finova-text)]">
-            Top Insights
-          </p>
-          <p className="mt-1 text-sm text-[var(--finova-muted)]">
-            Quick signals pulled from the same filtered dataset.
+            Ledger insights
           </p>
         </div>
 
-        <span className="rounded-full bg-[var(--finova-accent-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--finova-accent)]">
-          Live
-        </span>
       </div>
 
       <div className="mt-5 space-y-4">

@@ -1,0 +1,14 @@
+{
+  "name": "ledgerview",
+  "private": true,
+  "scripts": {
+    "start": "npm --prefix finance-dashboard start",
+    "test": "npm --prefix finance-dashboard test",
+    "setup": "npm ci --prefix finance-dashboard",
+    "dev": "npm --prefix finance-dashboard run dev --",
+    "build": "npm --prefix finance-dashboard run build",
+    "build:only": "npm --prefix finance-dashboard run build:only",
+    "lint": "npm --prefix finance-dashboard run lint",
+    "preview": "npm --prefix finance-dashboard run preview --"
+  }
+}

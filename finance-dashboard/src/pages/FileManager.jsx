@@ -28,10 +28,10 @@ export default function FileManager() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const result = uploadWorkspaceFile(fileDraft);
+    const result = await uploadWorkspaceFile(fileDraft);
 
     if (!result.success) {
       setStatusMessage(result.message);
@@ -43,7 +43,7 @@ export default function FileManager() {
     setIsUploaderOpen(false);
   };
 
-  const handleDeleteFile = (fileId) => {
+  const handleDeleteFile = async (fileId) => {
     const shouldDelete = window.confirm(
       "Delete this stored file? This action cannot be undone.",
     );
@@ -52,7 +52,8 @@ export default function FileManager() {
       return;
     }
 
-    deleteWorkspaceFile(fileId);
+    const deletion = await deleteWorkspaceFile(fileId);
+    if (!deletion.success) return;
     setStatusMessage("File deleted from workspace storage.");
   };
 
@@ -96,7 +97,7 @@ export default function FileManager() {
               <input
                 className="h-11 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)]"
                 name="name"
-                placeholder="portfolio-update.txt"
+                placeholder="File name"
                 type="text"
                 value={fileDraft.name}
                 onChange={handleDraftChange}

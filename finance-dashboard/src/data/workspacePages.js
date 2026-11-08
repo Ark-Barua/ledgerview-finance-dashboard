@@ -1,5 +1,5 @@
 import {
-  BarChart3,
+  BarChart3, NotebookPen, Contact,
   CalendarDays,
   FileText,
   FolderKanban,
@@ -22,6 +22,8 @@ export const workspacePages = [
     icon: LayoutDashboard,
     allowedRoles: ["viewer", "admin"],
   },
+  { id: "planning", path: "/planning", label: "Planning", description: "Budgets, recurring entries and cash forecasts.", icon: NotebookPen, allowedRoles: ["viewer","admin"] },
+  { id: "profile", path: "/profile", label: "Profile", description: "Your personal ledger card.", icon: Contact, allowedRoles: ["viewer","admin"] },
   {
     id: "asset-graph",
     path: "/asset-graph",

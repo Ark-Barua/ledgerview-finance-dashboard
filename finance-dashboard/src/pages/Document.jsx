@@ -12,7 +12,7 @@ function createEmptyDocumentDraft() {
 }
 
 export default function Document() {
-  const { deleteDocument, documents, role, updateDocument } = useFinance();
+  const { createDocument, deleteDocument, documents, role, updateDocument } = useFinance();
   const [selectedDocumentId, setSelectedDocumentId] = useState(
     documents[0]?.id ?? null,
   );
@@ -38,26 +38,24 @@ export default function Document() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!editingDocument) {
-      return;
-    }
-
-    const result = updateDocument(editingDocument.id, documentDraft);
+    const result = editingDocumentId === "new"
+      ? await createDocument(documentDraft)
+      : await updateDocument(editingDocument.id, documentDraft);
 
     if (!result.success) {
       setStatusMessage(result.message);
       return;
     }
 
-    setStatusMessage("Document updated successfully.");
-    setSelectedDocumentId(editingDocument.id);
+    setStatusMessage("Document saved.");
+    setSelectedDocumentId(editingDocument?.id ?? result.workspace.documents[0].id);
     setEditingDocumentId(null);
   };
 
-  const handleDeleteDocument = (documentId) => {
+  const handleDeleteDocument = async (documentId) => {
     const shouldDelete = window.confirm(
       "Delete this document? This action cannot be undone.",
     );
@@ -66,7 +64,8 @@ export default function Document() {
       return;
     }
 
-    deleteDocument(documentId);
+    const deletion = await deleteDocument(documentId);
+    if (!deletion.success) return;
     setStatusMessage("Document deleted successfully.");
 
     if (selectedDocumentId === documentId) {
@@ -91,6 +90,11 @@ export default function Document() {
           Centralized document access for runbooks, templates, and written
           finance briefs.
         </p>
+        {isAdmin && <button className="finova-action-button mt-4" onClick={() => {
+          setEditingDocumentId("new");
+          setDocumentDraft(createEmptyDocumentDraft());
+          setStatusMessage("");
+        }}>Create document</button>}
       </section>
 
       <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.9fr)]">
@@ -162,11 +166,11 @@ export default function Document() {
         </section>
 
         <section className="finova-card px-5 py-5 sm:px-6">
-          {editingDocument ? (
+          {editingDocument || editingDocumentId === "new" ? (
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="flex items-center justify-between gap-3">
                 <p className="text-lg font-semibold text-[var(--finova-text)]">
-                  Edit document
+                  {editingDocument ? "Edit document" : "New document"}
                 </p>
                 <button
                   className="finova-action-button finova-action-button--sm"
@@ -249,7 +253,7 @@ export default function Document() {
             </div>
           ) : (
             <div className="finova-card-soft px-4 py-10 text-center text-sm text-[var(--finova-muted)]">
-              Select a document to preview it here.
+              {documents.length ? "Select a document to preview it here." : "No documents yet."}
             </div>
           )}
         </section>

@@ -7,14 +7,14 @@ import { formatCompactCurrency, formatCurrency } from "../utils/calculateStats";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const palette = ["#7e7cf5", "#f7a8d6", "#ffcf86", "#8ad9f2", "#95e1c3", "#f08b96"];
+const palette = ["#315d48", "#a9bf74", "#c77b51", "#e0c68c", "#72a398", "#9b8070"];
 
 function getChartOptions(animationEnabled, isDarkMode) {
   return {
     responsive: true,
     maintainAspectRatio: false,
     cutout: "68%",
-    animation: animationEnabled
+    animation: animationEnabled && !window.matchMedia("(prefers-reduced-motion: reduce)").matches
       ? {
           duration: 650,
           easing: "easeOutQuart",
@@ -83,10 +83,10 @@ export default function CategoryChart({ isDarkMode = false }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-lg font-semibold text-[var(--finova-text)]">
-            Spending Types
+            Spending breakdown
           </p>
           <p className="mt-1 text-sm text-[var(--finova-muted)]">
-            Expense mix across the active transaction view.
+            Expenses by category.
           </p>
         </div>
 

@@ -122,7 +122,7 @@ export default function TransactionTable() {
     setIsEditorOpen(false);
   };
 
-  const handleDeleteTransaction = (transactionId) => {
+  const handleDeleteTransaction = async (transactionId) => {
     if (!isAdmin) {
       return;
     }
@@ -135,14 +135,15 @@ export default function TransactionTable() {
       return;
     }
 
-    deleteTransaction(transactionId);
+    const deletion = await deleteTransaction(transactionId);
+    if (!deletion.success) return;
 
     if (editingTransactionId === transactionId) {
       handleCloseEditor();
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!isAdmin) {
@@ -179,11 +180,8 @@ export default function TransactionTable() {
     };
 
     // One compact editor handles both add and edit flows so the admin UI stays simple.
-    if (isEditing) {
-      updateTransaction(normalizedTransaction);
-    } else {
-      addTransaction(normalizedTransaction);
-    }
+    const result = isEditing ? await updateTransaction(normalizedTransaction) : await addTransaction(normalizedTransaction);
+    if (!result.success) { setFormError(result.message); return; }
 
     handleCloseEditor();
   };
@@ -277,7 +275,7 @@ export default function TransactionTable() {
                 className="h-11 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)] disabled:cursor-not-allowed disabled:bg-[var(--finova-bg-soft)]"
                 disabled={areEditorInputsDisabled}
                 name="account"
-                placeholder="Salary Account"
+                placeholder="Account name"
                 type="text"
                 value={draftTransaction.account}
                 onChange={handleDraftChange}
@@ -293,7 +291,7 @@ export default function TransactionTable() {
                 disabled={areEditorInputsDisabled}
                 list="transaction-categories"
                 name="category"
-                placeholder="Food"
+                placeholder="Category name"
                 type="text"
                 value={draftTransaction.category}
                 onChange={handleDraftChange}

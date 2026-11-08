@@ -31,7 +31,7 @@ export default function Filters() {
 
           <div>
             <p className="text-sm font-semibold text-[var(--finova-text)]">
-              Smart Filters
+              Transaction filters
             </p>
             <p className="text-sm text-[var(--finova-muted)]">
               {filteredTransactions.length} of {transactions.length} transactions visible

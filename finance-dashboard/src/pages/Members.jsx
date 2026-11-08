@@ -34,10 +34,10 @@ export default function Members() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const result = inviteMember(memberDraft);
+    const result = await inviteMember(memberDraft);
 
     if (!result.success) {
       setStatusMessage(result.message);
@@ -49,7 +49,7 @@ export default function Members() {
     setIsInviteOpen(false);
   };
 
-  const handleDeleteMember = (memberId) => {
+  const handleDeleteMember = async (memberId) => {
     const shouldDelete = window.confirm(
       "Delete this member account? This action cannot be undone.",
     );
@@ -58,7 +58,7 @@ export default function Members() {
       return;
     }
 
-    const result = deleteMember(memberId);
+    const result = await deleteMember(memberId);
 
     if (!result.success) {
       setStatusMessage(result.message);
@@ -108,7 +108,7 @@ export default function Members() {
               <input
                 className="h-11 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)]"
                 name="name"
-                placeholder="Jordan Finance"
+                placeholder="Full name"
                 type="text"
                 value={memberDraft.name}
                 onChange={handleDraftChange}
@@ -122,7 +122,7 @@ export default function Members() {
               <input
                 className="h-11 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)]"
                 name="email"
-                placeholder="new.member@ledgerview.app"
+                placeholder="Email address"
                 type="email"
                 value={memberDraft.email}
                 onChange={handleDraftChange}
@@ -131,12 +131,12 @@ export default function Members() {
 
             <label className="block">
               <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-[var(--finova-muted)]">
-                Temporary password
+                Account password
               </span>
               <input
                 className="h-11 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)]"
                 name="password"
-                placeholder="Minimum 6 characters"
+                minLength={12} maxLength={256} placeholder="At least 12 characters"
                 type="password"
                 value={memberDraft.password}
                 onChange={handleDraftChange}

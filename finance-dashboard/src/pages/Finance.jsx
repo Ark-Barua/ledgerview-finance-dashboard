@@ -45,10 +45,10 @@ export default function Finance() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const result = addFinanceNote(noteDraft);
+    const result = await addFinanceNote(noteDraft);
 
     if (!result.success) {
       setStatusMessage(result.message);
@@ -60,7 +60,7 @@ export default function Finance() {
     setIsComposerOpen(false);
   };
 
-  const handleDeleteNote = (noteId) => {
+  const handleDeleteNote = async (noteId) => {
     const shouldDelete = window.confirm(
       "Delete this finance note? This action cannot be undone.",
     );
@@ -69,7 +69,8 @@ export default function Finance() {
       return;
     }
 
-    deleteFinanceNote(noteId);
+    const deletion = await deleteFinanceNote(noteId);
+    if (!deletion.success) return;
     setStatusMessage("Finance note deleted.");
   };
 
@@ -132,7 +133,7 @@ export default function Finance() {
               <input
                 className="h-11 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)]"
                 name="title"
-                placeholder="Month-end reminder"
+                placeholder="Note title"
                 type="text"
                 value={noteDraft.title}
                 onChange={handleDraftChange}

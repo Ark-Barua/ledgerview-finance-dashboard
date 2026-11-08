@@ -41,10 +41,10 @@ export default function Events() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const result = createEvent(eventDraft);
+    const result = await createEvent(eventDraft);
 
     if (!result.success) {
       setStatusMessage(result.message);
@@ -56,7 +56,7 @@ export default function Events() {
     setIsComposerOpen(false);
   };
 
-  const handleDeleteEvent = (eventId) => {
+  const handleDeleteEvent = async (eventId) => {
     const shouldDelete = window.confirm(
       "Delete this workspace event? This action cannot be undone.",
     );
@@ -65,7 +65,8 @@ export default function Events() {
       return;
     }
 
-    deleteEvent(eventId);
+    const deletion = await deleteEvent(eventId);
+    if (!deletion.success) return;
     setStatusMessage("Event deleted successfully.");
   };
 
@@ -109,7 +110,7 @@ export default function Events() {
               <input
                 className="h-11 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)]"
                 name="title"
-                placeholder="Quarterly planning sync"
+                placeholder="Event title"
                 type="text"
                 value={eventDraft.title}
                 onChange={handleDraftChange}

@@ -1,17 +1,17 @@
 import { motion } from "framer-motion";
 import {
-  Bell,
   Download,
   Menu,
   MoonStar,
   Search,
-  ShieldCheck,
   Sparkles,
   SunMedium,
   X,
 } from "lucide-react";
 import {
   createElement,
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -23,16 +23,16 @@ import BrandLogo from "./components/BrandLogo";
 import RoleSwitcher from "./components/RoleSwitcher";
 import { FinanceProvider, useFinance } from "./context/FinanceContext";
 import { workspacePages } from "./data/workspacePages";
-import AdminCenter from "./pages/AdminCenter";
-import AssetGraph from "./pages/AssetGraph";
-import AssetManagement from "./pages/AssetManagement";
-import Dashboard from "./pages/Dashboard";
-import Document from "./pages/Document";
-import Events from "./pages/Events";
-import FileManager from "./pages/FileManager";
-import Finance from "./pages/Finance";
-import Members from "./pages/Members";
-import Reports from "./pages/Reports";
+const AdminCenter = lazy(() => import("./pages/AdminCenter"));
+const AssetGraph = lazy(() => import("./pages/AssetGraph"));
+const AssetManagement = lazy(() => import("./pages/AssetManagement"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Document = lazy(() => import("./pages/Document"));
+const Events = lazy(() => import("./pages/Events"));
+const FileManager = lazy(() => import("./pages/FileManager"));
+const Finance = lazy(() => import("./pages/Finance"));
+const Members = lazy(() => import("./pages/Members"));
+const Reports = lazy(() => import("./pages/Reports"));
 
 const THEME_STORAGE_KEY = "finance-dashboard:theme";
 const AUTH_ROUTE_PATH = "/auth";
@@ -40,6 +40,8 @@ const MotionSection = motion.section;
 
 const pageComponents = {
   dashboard: Dashboard,
+  planning: lazy(() => import("./pages/Planning")),
+  profile: lazy(() => import("./pages/Profile")),
   "asset-graph": AssetGraph,
   events: Events,
   "asset-management": AssetManagement,
@@ -143,11 +145,11 @@ function navigateBrowserPath(nextPath, options = {}) {
 function WorkspaceApp() {
   const {
     accessiblePages,
+    currentUser,
     animationEnabled,
     currentPage,
     filteredTransactions,
     isAuthenticated,
-    role,
     searchQuery,
     setAnimationEnabled,
     setCurrentPage,
@@ -240,7 +242,6 @@ function WorkspaceApp() {
   const activePage =
     isRouteAllowed && routePage ? routePage : fallbackPage ?? workspacePages[0];
   const PageComponent = pageComponents[activePage.id] ?? Dashboard;
-  const formattedRole = role.charAt(0).toUpperCase() + role.slice(1);
 
   const handleExportCsv = useCallback(() => {
     if (!filteredTransactions.length) {
@@ -265,7 +266,7 @@ function WorkspaceApp() {
 
   const getSectionMotion = useCallback(
     (delay = 0) => {
-      if (!animationEnabled) {
+      if (!animationEnabled || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
         return {};
       }
 
@@ -354,7 +355,7 @@ function WorkspaceApp() {
   }
 
   return (
-    <main className="finova-shell lg:h-screen lg:overflow-hidden">
+    <main data-motion={animationEnabled ? "on" : "off"} className="finova-shell lg:h-screen lg:overflow-hidden">
       <div className="finova-layout lg:h-screen">
         {!isDesktopViewport ? (
           <button
@@ -367,7 +368,7 @@ function WorkspaceApp() {
           />
         ) : null}
 
-        <aside
+        <aside inert={!isDesktopViewport && !isSidebarOpen}
           className={`finova-sidebar fixed inset-y-0 left-0 z-40 w-[min(86vw,320px)] max-w-full transition-transform duration-300 ease-out lg:static lg:z-auto lg:w-auto lg:translate-x-0 lg:overflow-hidden ${
             isDesktopViewport || isSidebarOpen
               ? "translate-x-0 pointer-events-auto"
@@ -393,9 +394,10 @@ function WorkspaceApp() {
             <div className="mx-2 mt-4 h-px bg-[var(--finova-border)]" />
 
             <nav className="finova-scroll mt-4 min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
-              {accessiblePages.map((page) => (
+              {accessiblePages.filter(page => page.id !== "profile").map((page) => (
                 <button
                   key={page.id}
+                  aria-current={activePage.id === page.id ? "page" : undefined}
                   className={`finova-nav-item flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-medium ${
                     activePage.id === page.id
                       ? "bg-[var(--finova-accent)] text-white shadow-[0_14px_24px_-22px_rgba(126,124,245,0.8)]"
@@ -418,7 +420,7 @@ function WorkspaceApp() {
                 Workspace Access
               </p>
               <div className="mt-2">
-                <RoleSwitcher />
+                <RoleSwitcher openProfile={() => { navigateToPage("profile"); setIsSidebarOpen(false); }} />
               </div>
             </div>
           </div>
@@ -426,7 +428,7 @@ function WorkspaceApp() {
 
         <section className="min-w-0 max-w-full overflow-x-hidden lg:flex lg:min-h-0 lg:flex-col lg:overflow-hidden">
           <header className="finova-topbar sticky top-0 z-20 px-4 py-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="workspace-toolbar">
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 {!isDesktopViewport ? (
                   <button
@@ -447,19 +449,17 @@ function WorkspaceApp() {
                   <p className="text-sm font-semibold text-[var(--finova-accent)]">
                     {activePage.label}
                   </p>
-                  <p className="truncate text-sm text-[var(--finova-muted)]">
-                    {activePage.description}
-                  </p>
+
                 </div>
               </div>
 
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-end xl:min-w-[640px]">
-                <label className="relative block lg:min-w-[240px] xl:min-w-[280px]">
+              <div className="workspace-tools">
+                <label className="relative block">
                   <span className="sr-only">Search workspace data</span>
                   <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--finova-muted)]" />
                   <input
                     className="h-12 w-full rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] pl-11 pr-4 text-sm text-[var(--finova-text)] outline-none transition focus:border-[var(--finova-accent)]"
-                    placeholder="Search anything here..."
+                    placeholder="Search transactions…"
                     type="text"
                     value={searchQuery}
                     onChange={(event) => setSearchQuery(event.target.value)}
@@ -467,19 +467,6 @@ function WorkspaceApp() {
                 </label>
 
                 <div className="flex flex-wrap items-center gap-2 justify-start sm:justify-end">
-                  <div className="inline-flex items-center gap-2 rounded-2xl border border-[var(--finova-border)] bg-[var(--finova-surface)] px-4 py-2.5 text-sm font-medium text-[var(--finova-text)]">
-                    <ShieldCheck className="h-4 w-4 text-[var(--finova-accent)]" />
-                    <span className="hidden sm:inline">Role:</span> {formattedRole}
-                  </div>
-
-                  <button
-                    className="finova-icon-button h-11 w-11"
-                    type="button"
-                    aria-label="Notifications"
-                  >
-                    <Bell className="h-4 w-4" />
-                  </button>
-
                   {headerActionButtons.map((actionButton) => (
                     <button
                       key={actionButton.label}
@@ -487,10 +474,11 @@ function WorkspaceApp() {
                       disabled={actionButton.disabled}
                       type="button"
                       onClick={actionButton.onClick}
+                      title={actionButton.label}
                       aria-label={actionButton.label}
                     >
                       {createElement(actionButton.icon, { className: "h-4 w-4" })}
-                      <span className="hidden sm:inline">{actionButton.label}</span>
+                      <span className="toolbar-label">{actionButton.label}</span>
                     </button>
                   ))}
                 </div>
@@ -500,11 +488,13 @@ function WorkspaceApp() {
 
           <div className="min-w-0 max-w-full space-y-5 overflow-x-hidden px-4 py-5 sm:px-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:px-8 lg:py-6">
             <MotionSection
-              key={activePage.id}
+              key={currentUser.id + ":" + activePage.id}
               className="min-w-0 max-w-full overflow-x-hidden"
               {...getSectionMotion(0.04)}
             >
-              <PageComponent isDarkMode={isDarkMode} />
+              <Suspense fallback={<p role="status">Loading workspace…</p>}>
+                <PageComponent isDarkMode={isDarkMode} />
+              </Suspense>
             </MotionSection>
           </div>
         </section>
