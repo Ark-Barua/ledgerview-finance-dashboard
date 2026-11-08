@@ -7,8 +7,6 @@ LedgerView is a modern finance workspace built with React, Vite, and Tailwind CS
 | Environment | Details |
 | --- | --- |
 | **Production Domain** | [ledgerview-finance-dashboard.vercel.app](https://ledgerview-finance-dashboard.vercel.app/) |
-| **Deployment Preview** | [ledgerview-finance-dashboard-38p7n57fy-pro5765s-projects.vercel.app](https://ledgerview-finance-dashboard-38p7n57fy-pro5765s-projects.vercel.app/) |
-| **Vercel Dashboard** | [Inspect Deployment (`pro5765s-projects`)](https://vercel.com/pro5765s-projects/ledgerview-finance-dashboard/H7pc31nGBbrk9Woix5xvZGyVbWff) |
 | **Status** | Ready · Hosted on Vercel |
 
 ## Overview
