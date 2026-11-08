@@ -2,6 +2,15 @@
 
 LedgerView is a modern finance workspace built with React, Vite, and Tailwind CSS. It combines a polished analytics dashboard with authentication, protected routes, role-based access control, admin workflows, and SQLite persistence in a responsive product-style interface.
 
+## Live Deployment
+
+| Environment | Details |
+| --- | --- |
+| **Production Domain** | [ledgerview-finance-dashboard.vercel.app](https://ledgerview-finance-dashboard.vercel.app/) |
+| **Deployment Preview** | [ledgerview-finance-dashboard-38p7n57fy-pro5765s-projects.vercel.app](https://ledgerview-finance-dashboard-38p7n57fy-pro5765s-projects.vercel.app/) |
+| **Vercel Dashboard** | [Inspect Deployment (`pro5765s-projects`)](https://vercel.com/pro5765s-projects/ledgerview-finance-dashboard/H7pc31nGBbrk9Woix5xvZGyVbWff) |
+| **Status** | Ready · Hosted on Vercel |
+
 ## Overview
 
 LedgerView began as a finance dashboard assignment and evolved into a multi-page workspace that feels closer to a real finance product than a static UI demo.
