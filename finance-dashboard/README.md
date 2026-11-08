@@ -21,7 +21,7 @@ The application includes:
 | Dashboard | Balance cards, cashflow trends, spending breakdown, insights, filters, and transaction views |
 | Authentication | Sign in, sign up, server-managed sessions, and isolated workspaces |
 | Access Control | Server-enforced viewer and admin roles with protected route handling |
-| Workspace Tools | Events, asset workflows, finance notes, file manager, documents, reports, and admin center |
+| Workspace Tools | Planning, profile card, events, asset workflows, finance notes, file manager, documents, reports, and admin center |
 | UX | Dark mode, motion toggle, mobile sidebar, responsive layout, and branded UI |
 
 ## Features
@@ -69,8 +69,8 @@ The application includes:
 
 | Role | Accessible pages | Capabilities |
 | --- | --- | --- |
-| Viewer | Dashboard, Asset Graph, Events, Finance, Members, File Manager, Document | Read-only access to reporting and workspace data |
-| Admin | All viewer pages plus Asset Management, Reports, and Admin Center | Full create, update, delete, and management permissions |
+| Viewer | Dashboard, Planning, Profile, Asset Graph, Events, Finance, Members, File Manager, Document | Read-only access to reporting and workspace data, plus personal profile management |
+| Admin | All viewer pages plus Asset Management, Reports, and Admin Center | Full create, update, delete, budget/recurring/report scheduling, and management permissions |
 
 ## Assignment Requirement Mapping
 
@@ -116,60 +116,85 @@ When signing up from a browser that used the old app, select the import option t
 | --- | --- |
 | Frontend | React 19, React DOM 19 |
 | Build tooling | Vite 8 |
+| Transaction state | Redux Toolkit and React Redux |
 | Styling | Tailwind CSS 4 |
 | Charts | Chart.js, `react-chartjs-2` |
 | Motion | Framer Motion |
 | Icons | Lucide React |
+| Backend & Database | Node.js HTTP API, built-in SQLite (`node:sqlite`) |
 | Code quality | ESLint |
 
 ## Project Structure
 
 ```text
-src
-|-- assets
-|   `-- logo.png
-|-- components
-|   |-- AuthScreen.jsx
-|   |-- BrandLogo.jsx
-|   |-- CategoryChart.jsx
-|   |-- DashboardCards.jsx
-|   |-- Filters.jsx
-|   |-- Insights.jsx
-|   |-- RoleSwitcher.jsx
-|   |-- TransactionTable.jsx
-|   `-- TrendChart.jsx
-|-- context
-|   `-- FinanceContext.jsx
-|-- data
-|   `-- workspacePages.js
-|-- pages
-|   |-- AdminCenter.jsx
-|   |-- AssetGraph.jsx
-|   |-- AssetManagement.jsx
-|   |-- Dashboard.jsx
-|   |-- Document.jsx
-|   |-- Events.jsx
-|   |-- FileManager.jsx
-|   |-- Finance.jsx
-|   |-- Members.jsx
-|   `-- Reports.jsx
-|-- utils
-|   |-- calculateStats.js
-|   `-- downloadFile.js
-|-- App.jsx
-|-- index.css
-`-- main.jsx
+finance-dashboard
+|-- package.json
+|-- vite.config.js
+|-- server
+|   |-- api.mjs
+|   |-- api.test.mjs
+|   |-- auth.mjs
+|   |-- database.mjs
+|   |-- legacy-samples.mjs
+|   |-- profile.mjs
+|   |-- records.mjs
+|   |-- scheduler.mjs
+|   `-- start.mjs
+`-- src
+    |-- assets
+    |   `-- logo.png
+    |-- components
+    |   |-- AuthScreen.jsx
+    |   |-- BrandLogo.jsx
+    |   |-- CategoryChart.jsx
+    |   |-- DashboardCards.jsx
+    |   |-- Filters.jsx
+    |   |-- Insights.jsx
+    |   |-- RoleSwitcher.jsx
+    |   |-- TransactionTable.jsx
+    |   `-- TrendChart.jsx
+    |-- context
+    |   |-- FinanceContext.jsx
+    |   `-- useWorkspace.js
+    |-- data
+    |   `-- workspacePages.js
+    |-- pages
+    |   |-- AdminCenter.jsx
+    |   |-- AssetGraph.jsx
+    |   |-- AssetManagement.jsx
+    |   |-- Dashboard.jsx
+    |   |-- Document.jsx
+    |   |-- Events.jsx
+    |   |-- FileManager.jsx
+    |   |-- Finance.jsx
+    |   |-- Members.jsx
+    |   |-- Planning.jsx
+    |   |-- Profile.jsx
+    |   `-- Reports.jsx
+    |-- store
+    |   `-- ledger.js
+    |-- utils
+    |   |-- calculateStats.js
+    |   |-- downloadFile.js
+    |   |-- legacyWorkspace.js
+    |   |-- reportExport.js
+    |   `-- schedule.js
+    |-- App.jsx
+    |-- index.css
+    `-- main.jsx
 ```
 
 ### Key Modules
 
 | Module | Responsibility |
 | --- | --- |
-| `src/context/FinanceContext.jsx` | Shared application state, auth handling, persistence, RBAC, and workspace actions |
+| `server/*` | Node HTTP API, SQLite schema/persistence, scrypt auth & sessions, UTC scheduler, and standalone static server |
+| `src/context/FinanceContext.jsx` & `src/context/useWorkspace.js` | Shared application state, queued API synchronization, RBAC, and workspace actions |
+| `src/store/ledger.js` | Redux Toolkit store holding the active workspace snapshot |
 | `src/data/workspacePages.js` | Central page registry and role access metadata |
-| `src/pages/*` | Workspace-level views such as dashboard, reports, finance, and admin center |
+| `src/pages/*` | Workspace views such as dashboard, planning, profile, reports, finance, and admin center |
 | `src/components/*` | Reusable UI building blocks for charts, filters, auth, branding, and data views |
-| `src/utils/*` | Formatting, statistics, and helper logic |
+| `src/utils/*` | Formatting, statistics, forecast/recurrence scheduling, report export, and legacy import helpers |
 
 ## Getting Started
 
@@ -205,6 +230,8 @@ http://localhost:5173
 | `npm run build` | Build and serve the app. Open the Local URL printed in the terminal. |
 | `npm run build:only` | Create a production build and exit |
 | `npm run preview` | Preview the production build locally |
+| `npm start` | Start the standalone production API and static server |
+| `npm test` | Run backend API, authentication, RBAC, and persistence tests |
 | `npm run lint` | Run ESLint checks |
 
 ## Database and server
@@ -228,7 +255,7 @@ The application uses URL-aware protected routing tied to authentication and role
 
 ## Future Improvements
 
-- Introduce automated tests for auth, routing, and workspace flows
+- Expand automated tests beyond the backend API suite to cover frontend routing and UI workspace flows
 - Support cloud-backed file storage and multi-user synchronization
 
 ## License
